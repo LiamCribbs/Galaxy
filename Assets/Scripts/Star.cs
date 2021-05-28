@@ -7,6 +7,7 @@ public class Star : MonoBehaviour
     public new LineRenderer renderer;
 
     public int hyperlanes;
+    public List<Star> connectedStars = new List<Star>(2);
 
     public new string name;
 

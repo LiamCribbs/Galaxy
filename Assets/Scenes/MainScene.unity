@@ -361,9 +361,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 2111412114}
-  - {fileID: 548974175}
   - {fileID: 1738431142}
-  - {fileID: 1354125242}
   m_Father: {fileID: 88079991}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -955,18 +953,18 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 548974174}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 118282461}
-  m_RootOrder: 1
+  m_Father: {fileID: 2111412114}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 210, y: 0}
+  m_AnchoredPosition: {x: -10, y: 50}
   m_SizeDelta: {x: 210, y: 50}
-  m_Pivot: {x: 0, y: 1}
+  m_Pivot: {x: 1, y: 1}
 --- !u!114 &548974176
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -987,7 +985,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 100
+  m_text: 100%
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 68f833c82338bd54cad8e44479c417b7, type: 2}
   m_sharedMaterial: {fileID: 7199282224415494307, guid: 68f833c82338bd54cad8e44479c417b7, type: 2}
@@ -1021,7 +1019,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 4
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -1109,7 +1107,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gridObject_EDITOR: {fileID: 2132180585}
   starPrefab: {fileID: 3708481112217832232, guid: ec64c3ef42ca9dc4ca27e43fc6aa90e3, type: 3}
-  numStars: 4000
+  numStars: 3000
   galaxySize: 100
   minStarDistance: 3
   maxPositionIterations: 5
@@ -1125,12 +1123,14 @@ MonoBehaviour:
   loadingBarLerpSpeed: 2
   loadingBarPercent: {fileID: 548974176}
   anomalousStars: {fileID: 1354125243}
+  loadingBarTextBottom: {fileID: 2111412115}
+  loadingBarTextTop: {fileID: 1738431143}
   starNameText: {fileID: 462125176}
   starNames: {fileID: 4900000, guid: d43881d5f11998c48a35690190c653a5, type: 3}
   starNamePrefixes: {fileID: 4900000, guid: 865fa0db3fdc872458d30a67268f4cb3, type: 3}
   starNumberPrefixChance: 0.05
   hyperlaneMaterial: {fileID: 2100000, guid: 423f4b7cd2001364a92a842c5add30e7, type: 2}
-  maxHyperlaneDistance: 20
+  maxHyperlaneDistance: 50
 --- !u!4 &930747360
 Transform:
   m_ObjectHideFlags: 0
@@ -1257,18 +1257,18 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1354125241}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 118282461}
-  m_RootOrder: 3
+  m_Father: {fileID: 1738431142}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -380, y: 0}
+  m_AnchoredPosition: {x: 10, y: -50}
   m_SizeDelta: {x: 210, y: 50}
-  m_Pivot: {x: 1, y: 0}
+  m_Pivot: {x: 0, y: 0}
 --- !u!114 &1354125243
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1323,7 +1323,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 4
+  m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -1851,14 +1851,15 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 1354125242}
   m_Father: {fileID: 118282461}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 380, y: 50}
+  m_SizeDelta: {x: 600, y: 50}
   m_Pivot: {x: 1, y: 0}
 --- !u!114 &1738431143
 MonoBehaviour:
@@ -2547,14 +2548,15 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 548974175}
   m_Father: {fileID: 118282461}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 210, y: 50}
+  m_SizeDelta: {x: 600, y: 50}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &2111412115
 MonoBehaviour:
@@ -2576,7 +2578,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: PROGRESS
+  m_text: Mapping Stars
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7499d3a8274e50a40bf5f6c2d9e3a76f, type: 2}
   m_sharedMaterial: {fileID: -7763563364677059909, guid: 7499d3a8274e50a40bf5f6c2d9e3a76f, type: 2}
@@ -2609,7 +2611,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 16
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
   m_textAlignment: 65535

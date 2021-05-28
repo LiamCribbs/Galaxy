@@ -16,6 +16,8 @@ public class Galaxy : MonoBehaviour
     Star[] stars;
     DynamicGrid<Star> starCells;
 
+    List<List<Star>> constellations;
+
     [Space(10)]
     public int numStars;
     public float galaxySize;
@@ -39,6 +41,8 @@ public class Galaxy : MonoBehaviour
     public float loadingBarLerpSpeed = 5f;
     public TextMeshProUGUI loadingBarPercent;
     public TextMeshProUGUI anomalousStars;
+    public TextMeshProUGUI loadingBarTextBottom;
+    public TextMeshProUGUI loadingBarTextTop;
 
     [Space(10)]
     public TextMeshProUGUI starNameText;
@@ -217,53 +221,183 @@ public class Galaxy : MonoBehaviour
 
     IEnumerator DrawHyperlanes()
     {
-        //GL.PushMatrix();
-        //hyperlaneMaterial.SetPass(0);
-        //GL.MultMatrix(transform.localToWorldMatrix);
-        //GL.Begin(GL.LINES);
-        //GL.Vertex3(0f, 0f, 0f);
-        //GL.Vertex3(100f, 100f, 0f);
-        //GL.End();
-        //GL.PopMatrix();
-        //var stars = starCells[Vector2Int.zero];
+        loadingBarTextBottom.text = "Identifying Hyperlanes";
+        loadingBarTextTop.text = "Hyperlanes Found";
 
         int numStars = stars.Length;
         for (int i = 0; i < numStars; i++)
         {
             Star star = stars[i];
-            int minHyperlanes = int.MaxValue;
-            int bestIndex = -1;
+            float minDistance = float.MaxValue;
+            int bestDistanceIndex = -1;
 
             for (int j = 0; j < numStars; j++)
             {
-                if (j != i && (star.transform.position - stars[j].transform.position).sqrMagnitude < maxHyperlaneDistance * maxHyperlaneDistance)
+                if (j != i)
                 {
-                    int hyperlanes = stars[j].hyperlanes;
-                    if (hyperlanes < minHyperlanes)
+                    float distance = (star.transform.position - stars[j].transform.position).sqrMagnitude;
+                    if (distance < maxHyperlaneDistance * maxHyperlaneDistance && !stars[j].connectedStars.Contains(star))
                     {
-                        minHyperlanes = hyperlanes;
-                        bestIndex = j;
+                        if (distance < minDistance)
+                        {
+                            minDistance = distance;
+                            bestDistanceIndex = j;
+                        }
                     }
                 }
             }
 
-            if (bestIndex == -1)
+            if (bestDistanceIndex == -1)
             {
                 yield return null;
-                break;
+                continue;
             }
 
-            star.renderer.SetPositions(new Vector3[2] { star.transform.position, stars[bestIndex].transform.position });
-            star.hyperlanes++;
-            stars[bestIndex].hyperlanes++;
+            Star other = stars[bestDistanceIndex];
+
+            star.renderer.SetPositions(new Vector3[2] { star.transform.position, other.transform.position });
+            star.connectedStars.Add(other);
+            other.connectedStars.Add(star);
+
+            // Set loading bar
+            float percent = (float)i / (numStars - 1);
+            loadingBar.sizeDelta = new Vector2(Mathf.Lerp(loadingBar.rect.width, loadingBarWidth * percent, loadingBarLerpSpeed * Time.deltaTime), loadingBar.rect.height);
+            loadingBarPercent.text = (percent * 100f).ToString("0.0") + "%";
+            anomalousStars.text = i.ToString();
+
             yield return null;
+        }
+
+        StartCoroutine(FindConstellations());
+    }
+
+    IEnumerator FindConstellations()
+    {
+        loadingBarTextBottom.text = "Mapping Constellations";
+        loadingBarTextTop.text = "Constellations Found";
+
+        constellations = new List<List<Star>>();
+        for (int i = 0; i < stars.Length; i++)
+        {
+            Star star = stars[i];
+            List<Star> constellation;
+
+            for (int j = 0; j < constellations.Count; j++)
+            {
+                // If we're already in a constellation, all we need to do is add our connections to it
+                constellation = constellations[j];
+                if (constellation.Contains(star))
+                {
+                    // Add connections to constellation
+                    int index = constellations.IndexOf(constellation);
+
+                    for (int k = 0; k < star.connectedStars.Count; k++)
+                    {
+                        if (!constellation.Contains(star.connectedStars[k]))
+                        {
+                            constellation.Add(star.connectedStars[k]);
+                            SetStarColor(star.connectedStars[k], index);
+                        }
+                    }
+
+                    goto Continue;
+                }
+
+                for (int k = 0; k < star.connectedStars.Count; k++)
+                {
+                    // If any of our connections are in a constellation, we can add ourselves to it
+                    if (constellation.Contains(star.connectedStars[k]))
+                    {
+                        // Add ourself and connections to constellation
+                        int index = constellations.IndexOf(constellation);
+                        constellation.Add(star);
+                        SetStarColor(star, index);
+
+                        for (int m = 0; m < star.connectedStars.Count; m++)
+                        {
+                            if (!constellation.Contains(star.connectedStars[m]))
+                            {
+                                constellation.Add(star.connectedStars[m]);
+                                SetStarColor(star.connectedStars[m], index);
+                            }
+                        }
+
+                        goto Continue;
+                    }
+                }
+            }
+
+            // Create a new constellation if we haven't found any
+            constellation = new List<Star>(2)
+            {
+                star
+            };
+
+            int constellationIndex = constellations.Count;
+            SetStarColor(star, constellationIndex);
+
+            // Add connections to the new constellation
+            for (int j = 0; j < star.connectedStars.Count; j++)
+            {
+                constellation.Add(star.connectedStars[j]);
+                SetStarColor(star.connectedStars[j], constellationIndex);
+            }
+
+            constellations.Add(constellation);
+
+            Continue:
+
+            // Set loading bar
+            float percent = (float)i / (numStars - 1);
+            loadingBar.sizeDelta = new Vector2(Mathf.Lerp(loadingBar.rect.width, loadingBarWidth * percent, loadingBarLerpSpeed * Time.deltaTime), loadingBar.rect.height);
+            loadingBarPercent.text = (percent * 100f).ToString("0.0") + "%";
+            anomalousStars.text = constellations.Count.ToString();
+
+            yield return null;
+        }
+
+        for (int i = 0; i < constellations.Count; i++)
+        {
+            List<Star> constellation = constellations[i];
+            for (int j = 0; j < constellations.Count; j++)
+            {
+                if (j == i)
+                {
+                    continue;
+                }
+
+                if (constellation.Any(x => constellations[j].Any(y => y == x)))
+                {
+                    // add to new list in new constellations list
+                }
+            }
         }
     }
 
-    //void OnRenderObject()
-    //{
-    //    DrawHyperlanes();
-    //}
+    void SetStarColor(Star star, int index)
+    {
+        uint rand = Hash((uint)index);
+        float h = NormalizeHash(rand);
+        Color color = Color.HSVToRGB(h, NormalizeHash(Hash(rand)), 1f);
+        star.renderer.startColor = color;
+        star.renderer.endColor = color;
+    }
+
+    uint Hash(uint state)
+    {
+        state ^= 2747636419u;
+        state *= 2654435769u;
+        state ^= state >> 16;
+        state *= 2654435769u;
+        state ^= state >> 16;
+        state *= 2654435769u;
+        return state;
+    }
+
+    float NormalizeHash(uint rand)
+    {
+        return rand / 4294967295f;
+    }
 
     void SetStarInCircle(Star star)
     {
