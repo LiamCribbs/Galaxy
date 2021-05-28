@@ -30,7 +30,7 @@ public class CameraController : MonoBehaviour
     void Update()
     {
         // Zoom
-        float scrollDelta = Input.mouseScrollDelta.y;
+        float scrollDelta = -Input.mouseScrollDelta.y;
         if (scrollDelta != 0f)
         {
             scrollVelocity = scrollDelta;

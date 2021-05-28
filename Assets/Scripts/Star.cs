@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class Star : MonoBehaviour
 {
+    public new LineRenderer renderer;
+
+    public int hyperlanes;
+
     public new string name;
 
     public float mass;

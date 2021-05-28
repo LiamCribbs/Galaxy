@@ -38,6 +38,7 @@ public class Galaxy : MonoBehaviour
     public float loadingBarWidth = 3040f;
     public float loadingBarLerpSpeed = 5f;
     public TextMeshProUGUI loadingBarPercent;
+    public TextMeshProUGUI anomalousStars;
 
     [Space(10)]
     public TextMeshProUGUI starNameText;
@@ -46,6 +47,10 @@ public class Galaxy : MonoBehaviour
     public TextAsset starNames;
     public TextAsset starNamePrefixes;
     [Range(0f, 1f)] public float starNumberPrefixChance;
+
+    [Space(20)]
+    public Material hyperlaneMaterial;
+    public float maxHyperlaneDistance;
 
     class DynamicGrid<T>
     {
@@ -64,6 +69,8 @@ public class Galaxy : MonoBehaviour
             }
         }
 
+        public Dictionary<Vector2Int, List<T>>.ValueCollection Values { get => list.Values; }
+
         public DynamicGrid()
         {
             list = new Dictionary<Vector2Int, List<T>>();
@@ -78,6 +85,11 @@ public class Galaxy : MonoBehaviour
     void Start()
     {
         StartCoroutine(GenerateGalaxy());
+    }
+
+    void Update()
+    {
+        //DrawHyperlanes();
     }
 
     IEnumerator GenerateGalaxy()
@@ -97,9 +109,7 @@ public class Galaxy : MonoBehaviour
         for (int i = 0; i < numStars; i++)
         {
             Star star = Instantiate(starPrefab, transform).GetComponent<Star>();
-
-            Vector2 position = star.transform.position;
-            Vector2Int cell = new Vector2Int(Mathf.FloorToInt(position.x / starCellSize), Mathf.FloorToInt(position.y / starCellSize));
+            Vector2Int cell = Vector2Int.zero;
 
             if (Random.value <= armSpawnWeight)
             {
@@ -118,23 +128,35 @@ public class Galaxy : MonoBehaviour
 
             bool SpawnStar(System.Action SetStar)
             {
-                bool invalidPosition = true;
-                for (int j = 0; j < maxPositionIterations; j++)
+                int j;
+                for (j = 0; j < maxPositionIterations; j++)
                 {
                     SetStar();
+                    cell = new Vector2Int(Mathf.FloorToInt(star.transform.position.x / starCellSize), Mathf.FloorToInt(star.transform.position.y / starCellSize));
 
                     int starCount = starCells[cell].Count;
+                    if (starCount == 0)
+                    {
+                        return true;
+                    }
+
+                    bool valid = true;
                     for (int k = 0; k < starCount; k++)
                     {
                         if ((star.transform.position - stars[k].transform.position).sqrMagnitude < minStarDistance * minStarDistance)
                         {
-                            invalidPosition = false;
+                            valid = false;
                             break;
                         }
                     }
+
+                    if (valid)
+                    {
+                        return true;
+                    }
                 }
 
-                return invalidPosition;
+                return j == maxPositionIterations - 1;
             }
 
             string name;
@@ -173,19 +195,75 @@ public class Galaxy : MonoBehaviour
             stars[i] = star;
             starCells[cell].Add(star);
 
-            if (i % 2 == 0)
+            if (i % 10 == 0)
             {
                 yield return null;
             }
 
             // Set loading bar
-            float percent = (float)i / numStars;
+            float percent = (float)i / (numStars - 1);
             loadingBar.sizeDelta = new Vector2(Mathf.Lerp(loadingBar.rect.width, loadingBarWidth * percent, loadingBarLerpSpeed * Time.deltaTime), loadingBar.rect.height);
-            loadingBarPercent.text = percent == 1f ? "100%" : (percent * 100f).ToString("0.0") + "%";
+            loadingBarPercent.text = (percent * 100f).ToString("0.0") + "%";
+
+            anomalousStars.text = invalidStars.ToString();
         }
 
-        print("Invalid Star Positions: " + invalidStars);
+        // Set loading bar
+        loadingBar.sizeDelta = new Vector2(loadingBarWidth, loadingBar.rect.height);
+        loadingBarPercent.text = "100%";
+
+        StartCoroutine(DrawHyperlanes());
     }
+
+    IEnumerator DrawHyperlanes()
+    {
+        //GL.PushMatrix();
+        //hyperlaneMaterial.SetPass(0);
+        //GL.MultMatrix(transform.localToWorldMatrix);
+        //GL.Begin(GL.LINES);
+        //GL.Vertex3(0f, 0f, 0f);
+        //GL.Vertex3(100f, 100f, 0f);
+        //GL.End();
+        //GL.PopMatrix();
+        //var stars = starCells[Vector2Int.zero];
+
+        int numStars = stars.Length;
+        for (int i = 0; i < numStars; i++)
+        {
+            Star star = stars[i];
+            int minHyperlanes = int.MaxValue;
+            int bestIndex = -1;
+
+            for (int j = 0; j < numStars; j++)
+            {
+                if (j != i && (star.transform.position - stars[j].transform.position).sqrMagnitude < maxHyperlaneDistance * maxHyperlaneDistance)
+                {
+                    int hyperlanes = stars[j].hyperlanes;
+                    if (hyperlanes < minHyperlanes)
+                    {
+                        minHyperlanes = hyperlanes;
+                        bestIndex = j;
+                    }
+                }
+            }
+
+            if (bestIndex == -1)
+            {
+                yield return null;
+                break;
+            }
+
+            star.renderer.SetPositions(new Vector3[2] { star.transform.position, stars[bestIndex].transform.position });
+            star.hyperlanes++;
+            stars[bestIndex].hyperlanes++;
+            yield return null;
+        }
+    }
+
+    //void OnRenderObject()
+    //{
+    //    DrawHyperlanes();
+    //}
 
     void SetStarInCircle(Star star)
     {
