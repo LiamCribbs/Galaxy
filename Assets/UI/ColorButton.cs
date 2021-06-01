@@ -96,7 +96,7 @@ namespace Pigeon
             SetToNull(hoverCoroutine);
             if (hovering)
             {
-                hoverCoroutine = AnimateThickness(hoverColor, clickSpeed);
+                hoverCoroutine = AnimateThickness(hoverColor, hoverSpeed);
             }
             StartCoroutine(hoverCoroutine);
 

@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class Star : MonoBehaviour
 {
-    public new LineRenderer renderer;
+    public new Renderer renderer;
+    public LineRenderer hyperlaneRenderer;
 
     public int hyperlanes;
     public List<Star> connectedStars = new List<Star>(2);
@@ -13,4 +14,19 @@ public class Star : MonoBehaviour
 
     public float mass;
     public float radius;
+
+    public int constellationIndex = -1;
+
+    public SpectralClass spectralClass;
+}
+
+[System.Serializable]
+public class SpectralClass
+{
+    public char type;
+    [ColorUsage(true, true)] public Color color;
+    public Vector2 massRange;
+    public Vector2 radiusRange;
+    public float size;
+    public int spawnWeight;
 }

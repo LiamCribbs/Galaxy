@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
+    public static CameraController instance;
+
     Vector3 prevMousePosition;
     Vector3 mouseVelocity;
     public float scrollVelocity;
@@ -21,6 +23,11 @@ public class CameraController : MonoBehaviour
     public AnimationCurve zoomSpeedCurve;
 
     float bounds;
+
+    void Awake()
+    {
+        instance = this;
+    }
 
     void Start()
     {
@@ -59,7 +66,7 @@ public class CameraController : MonoBehaviour
         camera.orthographicSize = size;
 
         // Pan
-        if (Input.GetKey(KeyCode.Mouse1) || Input.GetKey(KeyCode.Mouse2))
+        if (Input.GetKey(KeyCode.Mouse0) || Input.GetKey(KeyCode.Mouse1) || Input.GetKey(KeyCode.Mouse2))
         {
             mouseVelocity = prevMousePosition - Input.mousePosition;
         }
@@ -94,12 +101,6 @@ public class CameraController : MonoBehaviour
         }
 
         camera.transform.position = position;
-
-        RaycastHit2D hit = Physics2D.Raycast(camera.ScreenToWorldPoint(Input.mousePosition), Vector2.zero, 0f);
-        if (hit.collider && hit.collider.TryGetComponent(out Star star))
-        {
-            Galaxy.instance.starNameText.text = star.name;
-        }
 
         prevMousePosition = Input.mousePosition;
     }
