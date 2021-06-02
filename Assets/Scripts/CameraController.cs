@@ -6,6 +6,9 @@ public class CameraController : MonoBehaviour
 {
     public static CameraController instance;
 
+    public UnityEngine.EventSystems.EventSystem eventSystem;
+    public UnityEngine.EventSystems.StandaloneInputModule input;
+
     Vector3 prevMousePosition;
     Vector3 mouseVelocity;
     public float scrollVelocity;
@@ -15,14 +18,21 @@ public class CameraController : MonoBehaviour
     public float moveDecelerationSpeed = 9.81f;
     public AnimationCurve zoomPanCurve;
 
+    bool canPan;
+
     [Space(10)]
     public float minZoom;
     public float maxZoom;
     public float zoomSpeed;
     public float zoomDecelerationSpeed = 6f;
     public AnimationCurve zoomSpeedCurve;
+    public Pigeon.Slider zoomSlider;
 
     float bounds;
+
+    [Space(10)]
+    public Pigeon.Button settingsButton;
+    public Transform settingsOpenGraphic;
 
     void Awake()
     {
@@ -31,7 +41,18 @@ public class CameraController : MonoBehaviour
 
     void Start()
     {
+        SetBounds();
+    }
+
+    public void SetBounds()
+    {
         bounds = Galaxy.instance.galaxySize * Galaxy.instance.armLength * 3.75f;
+    }
+
+    public void ToggleSettings()
+    {
+        settingsOpenGraphic.localScale = new Vector3(settingsButton.hovering ? 0.9f : -0.9f, settingsOpenGraphic.localScale.y, 1f);
+        settingsButton.SetHover(!settingsButton.hovering);
     }
 
     void Update()
@@ -51,6 +72,7 @@ public class CameraController : MonoBehaviour
             }
         }
 
+        float maxZoom = this.maxZoom * bounds;
         float sizePercentage = Mathf.InverseLerp(minZoom, maxZoom, camera.orthographicSize);
         float speed = zoomSpeed * zoomSpeedCurve.Evaluate(sizePercentage);
         float size = camera.orthographicSize + scrollVelocity * speed;
@@ -63,10 +85,17 @@ public class CameraController : MonoBehaviour
             size = minZoom;
         }
 
+        zoomSlider.Value = sizePercentage;
+
         camera.orthographicSize = size;
 
+        if (Input.GetKeyDown(KeyCode.Mouse0) || Input.GetKeyDown(KeyCode.Mouse1))
+        {
+            canPan = !eventSystem.IsPointerOverGameObject();
+        }
+
         // Pan
-        if (Input.GetKey(KeyCode.Mouse0) || Input.GetKey(KeyCode.Mouse1) || Input.GetKey(KeyCode.Mouse2))
+        if (canPan && (Input.GetKey(KeyCode.Mouse0) || Input.GetKey(KeyCode.Mouse1)))
         {
             mouseVelocity = prevMousePosition - Input.mousePosition;
         }
@@ -103,5 +132,10 @@ public class CameraController : MonoBehaviour
         camera.transform.position = position;
 
         prevMousePosition = Input.mousePosition;
+    }
+
+    public void SetZoom(float value)
+    {
+        camera.orthographicSize = Mathf.Lerp(minZoom, maxZoom * bounds, value);
     }
 }

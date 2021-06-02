@@ -24,7 +24,7 @@ namespace Pigeon
         {
             base.Awake();
 
-            defaultPosition = mainGraphic.localPosition;
+            defaultPosition = mainGraphic.anchoredPosition;
         }
 
         public virtual void SetDefaultOutlineThickness(Vector2 value)
@@ -56,7 +56,7 @@ namespace Pigeon
 
             hovering = false;
             SetToNull(hoverCoroutine);
-            hoverCoroutine = AnimatePosition(Vector2.zero, hoverSpeed);
+            hoverCoroutine = AnimatePosition(defaultPosition, hoverSpeed);
             StartCoroutine(hoverCoroutine);
 
             OnHoverExit?.Invoke();
@@ -97,8 +97,8 @@ namespace Pigeon
 
         IEnumerator AnimatePosition(Vector2 targetPosition, float speed)
         {
-            Vector2 initialThickness = mainGraphic.localPosition;
-            targetPosition += defaultPosition;
+            Vector2 initialThickness = mainGraphic.anchoredPosition;
+            //targetPosition += defaultPosition;
 
             float time = 0f;
 
@@ -110,7 +110,7 @@ namespace Pigeon
                     time = 1f;
                 }
 
-                mainGraphic.localPosition = Vector2.LerpUnclamped(initialThickness, targetPosition, easingFunctionClick.Invoke(time));
+                mainGraphic.anchoredPosition = Vector2.LerpUnclamped(initialThickness, targetPosition, easingFunctionClick.Invoke(time));
 
                 yield return null;
             }

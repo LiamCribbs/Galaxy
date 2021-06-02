@@ -61,11 +61,11 @@ public class Galaxy : MonoBehaviour
     public SpectralClass[] spectralClasses;
     int spectralClassesWeightSum;
 
-    //public float GalaxySize { set => galaxySize = value; }
-    public float NumStars { set => numStars = Mathf.RoundToInt(value); }
-    public float NumArms { set => NumArms = Mathf.RoundToInt(value); }
-    public float ArmLength { set => armLength = value; }
     public float GalaxySize { get; set; }
+    public float NumStars { get; set; }
+    public float NumArms { get; set; }
+    public float ArmLength { get; set; }
+    public float ArmOffset { get; set; }
 
     class DynamicGrid<T>
     {
@@ -123,6 +123,14 @@ public class Galaxy : MonoBehaviour
             constellations.Clear();
         }
 
+        galaxySize = GalaxySize;
+        numStars = Mathf.RoundToInt(NumStars);
+        numArms = Mathf.RoundToInt(NumArms);
+        armLength = ArmLength;
+        armOffset = ArmOffset;
+
+        CameraController.instance.SetBounds();
+
         StartCoroutine(GenerateGalaxy());
     }
 
@@ -146,6 +154,12 @@ public class Galaxy : MonoBehaviour
                 spectralClasses[i + 1] = obj;
             }
         }
+
+        GalaxySize = galaxySize;
+        NumStars = numStars;
+        NumArms = numArms;
+        ArmLength = armLength;
+        ArmOffset = armOffset;
     }
 
     void Start()
@@ -160,6 +174,9 @@ public class Galaxy : MonoBehaviour
 
     IEnumerator GenerateGalaxy()
     {
+        loadingBarTextBottom.text = "Mapping Stars";
+        loadingBarTextTop.text = "Anomalous Stars";
+
         stars = new Star[numStars];
         starCells = new DynamicGrid<Star>();
         int invalidStars = 0;
@@ -461,7 +478,7 @@ public class Galaxy : MonoBehaviour
 
     void SetStarInSpiral(Star star, float arm)
     {
-        float angle = Mathf.PI * armLength * Random.Range(spiralAreaRange * centerClusterSize, 1f);
+        float angle = Mathf.PI * armLength * Random.Range(spiralAreaRange / armLength * centerClusterSize, 1f);
         float offset = Random.value * armOffset * galaxySize;
         star.transform.position = Quaternion.Euler(0f, 0f, arm / numArms * 360f) * new Vector3(Mathf.Cos(angle) * angle * galaxySize + Random.Range(-offset, offset), Mathf.Sin(angle) * angle * galaxySize + Random.Range(-offset, offset));
     }

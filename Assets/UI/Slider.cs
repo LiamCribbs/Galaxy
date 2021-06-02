@@ -52,7 +52,10 @@ namespace Pigeon
 
         public void SetValueText()
         {
-            valueText.text = (roundTextToInt ? Mathf.RoundToInt(Value) : Value).ToString();
+            if (valueText != null)
+            {
+                valueText.text = roundTextToInt ? Mathf.RoundToInt(Value).ToString() : Value.ToString("0.00");
+            }
         }
 
         void Update()
