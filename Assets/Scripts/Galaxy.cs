@@ -61,6 +61,12 @@ public class Galaxy : MonoBehaviour
     public SpectralClass[] spectralClasses;
     int spectralClassesWeightSum;
 
+    //public float GalaxySize { set => galaxySize = value; }
+    public float NumStars { set => numStars = Mathf.RoundToInt(value); }
+    public float NumArms { set => NumArms = Mathf.RoundToInt(value); }
+    public float ArmLength { set => armLength = value; }
+    public float GalaxySize { get; set; }
+
     class DynamicGrid<T>
     {
         public readonly Dictionary<Vector2Int, List<T>> list;
@@ -98,12 +104,24 @@ public class Galaxy : MonoBehaviour
 
         foreach (var star in stars)
         {
+            if (!star)
+            {
+                continue;
+            }
+
             Destroy(star.gameObject);
         }
 
         stars = null;
-        starCells.list.Clear();
-        constellations.Clear();
+
+        if (starCells != null)
+        {
+            starCells.list.Clear();
+        }
+        if (constellations != null)
+        {
+            constellations.Clear();
+        }
 
         StartCoroutine(GenerateGalaxy());
     }

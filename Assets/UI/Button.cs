@@ -130,11 +130,11 @@ namespace Pigeon
                 return;
             }
 
-            if (clicking)
-            {
-                clicking = false;
-                OnClickUp?.Invoke();
-            }
+            //if (clicking)
+            //{
+            //    clicking = false;
+            //    OnClickUp?.Invoke();
+            //}
 
             hovering = false;
 
@@ -160,7 +160,7 @@ namespace Pigeon
                 return;
             }
 
-            clicking = true;
+            clicking = false;
             
             OnClickUp?.Invoke();
         }
